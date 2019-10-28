@@ -1,0 +1,15 @@
+---
+title: "lab10"
+author: "allstars"
+date: "10/28/2019"
+output: html_document
+---
+```{r, setup, message = FALSE, echo = FALSE, warning = FALSE}
+temp <- tempfile()
+questions <- read_csv("Questions_trunc.csv")
+data1 <- unzip("Answers_trunc.csv.zip")
+answers <- read_csv("./Answers_trunc.csv")
+questions
+answers
+```
+
