@@ -5,11 +5,39 @@ date: "10/28/2019"
 output: html_document
 ---
 ```{r, setup, message = FALSE, echo = FALSE, warning = FALSE}
+library(tidyverse)
 temp <- tempfile()
 questions <- read_csv("Questions_trunc.csv")
 data1 <- unzip("Answers_trunc.csv.zip")
 answers <- read_csv("./Answers_trunc.csv")
-questions
-answers
+
 ```
 
+## Individual Sections
+
+### Eugene Miller
+
+The feature of the text that I am measuring is whether a code chunk was included in a question or answer. That is, whether the string `"<code>"` is in a question or an answer. 
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+code_questions <- questions %>%
+  filter(str_detect(`Body`, "<code>"))
+noncode_questions <- questions %>%
+  filter(!str_detect(`Body`, "<code>"))
+code_answers <- answers %>%
+  filter(str_detect(`Body`, "<code>"))
+noncode_answers <- answers %>%
+  filter(!str_detect(`Body`, "<code>"))
+
+question_prop <- count(code_questions)/count(questions)
+answer_prop <- count(code_answers)/count(answers)
+
+question_mean <- mean(noncode_questions$Score)
+cquestion_mean <- mean(code_questions$Score)
+answer_mean <- mean(noncode_answers$Score)
+canswer_mean <- mean(code_answers$Score)
+
+```
+The proportion of questions that invoke the `"<code>"` string is `r question_prop` and the proportion for answers is `r answer_prop`. 
+
+The mean score for a question without code is `r question_mean`, however if the poster includes code in their question it is `r cquestion_mean`. Likewise for a answer with no code the mean score is `r answer_mean` and if code is included `r canswer_mean`. Therefore both good questions and good answers include code. This makes sense, as Stackoverflow is a forum based on coding questions. Communicating directly via code is more relevant to the theme of the board, and this is why posts involving code have a higher average score. 
