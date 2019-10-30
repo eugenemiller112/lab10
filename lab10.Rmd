@@ -12,6 +12,22 @@ data1 <- unzip("Answers_trunc.csv.zip")
 answers <- read_csv("./Answers_trunc.csv")
 
 ```
+## Timeliness of the Answer as a Feature
+```{r, fig.align='center', echo = FALSE, message = FALSE, warning = FALSE}
+#Timeliness of the Answer as a Feature
+
+data <- answers %>%
+  group_by(ParentId) %>% #All answers for each question grouped
+  mutate(ans_rank = order(order(CreationDate, decreasing = FALSE))) #Ranking answers by CreationDate
+
+#Plotting average score for every rank
+ggplot(data, aes(x = ans_rank, y = Score)) +
+  stat_summary(fun.y="mean", geom="bar") +
+  labs(x = "Answer Rank", title = "Average Score for Every Answer Rank") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+From this plot, it does not appear as though the timeliness of an answer has any correlation to the score it receives.
 
 ## Individual Sections
 
