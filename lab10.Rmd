@@ -1,7 +1,7 @@
 ---
-title: "lab10"
-author: "allstars"
-date: "10/28/2019"
+title: "Lab 10: Text and Time Analysis"
+author: "Johnny Tamanaha, Emily Archambault, Kaiyuan Fan, Eugene Miller, Jingzhi Zhang"
+date: "11/3/2019"
 output: html_document
 ---
 ```{r, setup, message = FALSE, echo = FALSE, warning = FALSE}
@@ -28,6 +28,19 @@ ggplot(data, aes(x = ans_rank, y = Score)) +
 ```
 
 From this plot, it does not appear as though the timeliness of an answer has any correlation to the score it receives.
+
+Does the data for scores follow a normal distribution? We will create a histogram of scores to determine if the data follows a normal distribution.
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE, fig.align = 'center'}
+ggplot(answers)+
+  geom_histogram(mapping = aes(x = Score)) +
+  scale_x_continuous(name="Score",limits = c(0,100)) + 
+  labs(y = "Number of Answers", title = "Distribution of Scores for Answers") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+From this plot we can see that scores to not follow a normal distribution. This means that Z scores and percentiles will not have the same meaning that they would if the data was normal. The relationship between Z score and percentile is not preserved.
+
 
 ## Individual Sections
 
