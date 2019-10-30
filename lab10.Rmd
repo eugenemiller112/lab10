@@ -48,7 +48,7 @@ From this plot we can see that scores to not follow a normal distribution. This 
 
 The feature of the text that I am measuring is whether a code chunk was included in a question or answer. That is, whether the string `"<code>"` is in a question or an answer. 
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.align = 'center'}
 code_questions <- questions %>%
   filter(str_detect(`Body`, "<code>"))
 noncode_questions <- questions %>%
@@ -66,7 +66,20 @@ cquestion_mean <- mean(code_questions$Score)
 answer_mean <- mean(noncode_answers$Score)
 canswer_mean <- mean(code_answers$Score)
 
+plot_data <- tribble(
+  ~Title, ~Score,
+  "Noncode Questions", question_mean,
+  "Code Questions", cquestion_mean,
+  "Noncode Answers", answer_mean,
+  "Code Answers", canswer_mean
+)
+
+ggplot(plot_data) +
+  geom_col(aes(x = reorder(Title,Score), y = Score)) + 
+  labs(y = "Average Score", x = "Entry Type", title = "Comparison of Code vs Noncode for Questions & Answers") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
+
 The proportion of questions that invoke the `"<code>"` string is `r question_prop` and the proportion for answers is `r answer_prop`. 
 
-The mean score for a question without code is `r question_mean`, however if the poster includes code in their question it is `r cquestion_mean`. Likewise for a answer with no code the mean score is `r answer_mean` and if code is included `r canswer_mean`. Therefore both good questions and good answers include code. This makes sense, as Stackoverflow is a forum based on coding questions. Communicating directly via code is more relevant to the theme of the board, and this is why posts involving code have a higher average score. 
+The mean score for a question without code is `r question_mean`, however if the poster includes code in their question it is `r cquestion_mean`. Likewise, for a answer with no code the mean score is `r answer_mean` and if code is included `r canswer_mean`. Therefore both good questions and good answers include code. This makes sense, as Stackoverflow is a forum based on coding questions. Communicating directly via code is more relevant to the theme of the board, and this is why posts involving code have a higher average score. 
