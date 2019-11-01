@@ -48,7 +48,7 @@ From this plot we can see that scores to not follow a normal distribution. This 
 
 The feature of the text that I am measuring is whether a code chunk was included in a question or answer. That is, whether the string `"<code>"` is in a question or an answer. 
 
-```{r echo=FALSE, fig.align=, message=FALSE, warning=FALSE}
+```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE}
 code_questions <- questions %>%
   filter(str_detect(`Body`, "<code>"))
 noncode_questions <- questions %>%
