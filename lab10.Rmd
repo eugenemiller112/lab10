@@ -8,7 +8,7 @@ output: html_document
 library(tidyverse)
 temp <- tempfile()
 questions <- read_csv("Questions_trunc.csv")
-data1 <- unzip("Answers_trunc.csv.zip")
+#data1 <- unzip("Answers_trunc.csv.zip")
 answers <- read_csv("./Answers_trunc.csv")
 
 ```
@@ -48,7 +48,7 @@ From this plot we can see that scores to not follow a normal distribution. This 
 
 The feature of the text that I am measuring is whether a code chunk was included in a question or answer. That is, whether the string `"<code>"` is in a question or an answer. 
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.align = 'center'}
+```{r echo=FALSE, fig.align=, message=FALSE, warning=FALSE}
 code_questions <- questions %>%
   filter(str_detect(`Body`, "<code>"))
 noncode_questions <- questions %>%
@@ -83,3 +83,21 @@ ggplot(plot_data) +
 The proportion of questions that invoke the `"<code>"` string is `r question_prop` and the proportion for answers is `r answer_prop`. 
 
 The mean score for a question without code is `r question_mean`, however if the poster includes code in their question it is `r cquestion_mean`. Likewise, for a answer with no code the mean score is `r answer_mean` and if code is included `r canswer_mean`. Therefore both good questions and good answers include code. This makes sense, as Stackoverflow is a forum based on coding questions. Communicating directly via code is more relevant to the theme of the board, and this is why posts involving code have a higher average score. 
+
+### Jingzhi Zhang
+
+The feature of the text that I am measuring is the number of paragraphs that were included in a question or an answer. That is, weather the string `"<p>"` is in a question or an answer.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.align = 'center'}
+answers <- mutate(answers, pcount = str_count(Body, "<p>"))
+answers
+questions <- mutate(questions, pcount = str_count(Body, "<p>"))
+questions
+
+ggplot(data = answers, mapping = aes(pcount, Score))+
+  geom_jitter()+ylim(c(0,4000))+
+  geom_smooth(method = "loess", se = F)+
+  labs(title = "Number of Paragraphs Vs. Score", y="Score",x="Number of Paragraphs")
+```
+
+This plot shows the relationships between numbers of paragraphs and score. Althought the line shows that as numbers of paragraph growing up the score is going up too, from the plot we can see that most of the dots gather around between 0 to 10 for x-axis and between 0 to 1000 for y-axis which means writing more paragraphs would not guarantee people get higher score and higher score does not exactly depend on number of paragraphs. 
