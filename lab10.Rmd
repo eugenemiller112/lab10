@@ -104,7 +104,7 @@ This plot shows the relationships between numbers of paragraphs and score. Altho
 
 ### Johnny Tamanaha
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 data_questions <- read_csv("Questions_trunc.csv")
 data_questions1 <- data_questions %>%
   mutate(is_question_formatted=str_detect(Body, "^<p>How[^(<p>)]*?")) %>%
@@ -118,7 +118,7 @@ ggplot(pretty_data_questions1) +
   ylab("Proportion") +
   scale_color_discrete(name="Question Type", labels=c("Unformatted", "Formatted"))
 ```
-```{r}
+```{r, message=FALSE, warning=FALSE}
 formatted_vs_unformatted <- data_questions1 %>%
   group_by(is_question_formatted) %>%
   summarize(`30%`=quantile(Score, .3), `40%`=quantile(Score, .4), `50%`=quantile(Score, .5), `60%`=quantile(Score, .6), `70%`=quantile(Score, .7), `80%`=quantile(Score, .8))
@@ -127,7 +127,7 @@ formatted_vs_unformatted
 
 The feature thaI I analyzed for questions was whether a question was well-formatted or not. I defined "well-formatted" as questions where the first paragraph starts with "How" and ends with "?". I chose this feature because I wanted to see the effect that question quality has on its score. There seems to be a positive relationship between question quality and score. From my plot, the proportion of scores is skewed right for non-well-formatted questions, while the proportion of scores is visibly less skewed for well-formatted questions. This is also supported by the quantiles for both groups, with well-formatted questions having much higher percentiles across the board.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 data_answers <- read_csv("Answers_trunc.csv")
 data_answers1 <- data_answers %>%
   filter(!is.na(Score)) %>%
@@ -141,7 +141,7 @@ ggplot(pretty_data_answers1) +
   ylab("Proportion") +
   scale_color_discrete(name="Referenced docs.python.org", labels=c("No", "Yes"))
 ```
-```{r}
+```{r, message=FALSE, warning=FALSE}
 docs_python_quantiles <- data_answers1 %>%
   group_by(docs_python) %>%
   summarize(`30%`=quantile(Score, .3), `40%`=quantile(Score, .4), `50%`=quantile(Score, .5), `60%`=quantile(Score, .6), `70%`=quantile(Score, .7), `80%`=quantile(Score, .8))
