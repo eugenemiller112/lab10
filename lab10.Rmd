@@ -101,3 +101,52 @@ ggplot(data = answers, mapping = aes(pcount, Score))+
 ```
 
 This plot shows the relationships between numbers of paragraphs and score. Althought the line shows that as numbers of paragraph growing up the score is going up too, from the plot we can see that most of the dots gather around between 0 to 10 for x-axis and between 0 to 1000 for y-axis which means writing more paragraphs would not guarantee people get higher score and higher score does not exactly depend on number of paragraphs. 
+
+### Johnny Tamanaha
+
+```{r}
+data_questions <- read_csv("Questions_trunc.csv")
+data_questions1 <- data_questions %>%
+  mutate(is_question_formatted=str_detect(Body, "^<p>How[^(<p>)]*?")) %>%
+  filter( !is.na(Score))
+  pretty_data_questions1 <- data_questions1 %>%
+  filter(Score<100)
+ggplot(pretty_data_questions1) +
+  geom_density(aes(x=Score, color=is_question_formatted)) +
+  labs(title="Scores For Formatted and Unformatted Questions") +
+  xlab("Score") + 
+  ylab("Proportion") +
+  scale_color_discrete(name="Question Type", labels=c("Unformatted", "Formatted"))
+```
+```{r}
+formatted_vs_unformatted <- data_questions1 %>%
+  group_by(is_question_formatted) %>%
+  summarize(`30%`=quantile(Score, .3), `40%`=quantile(Score, .4), `50%`=quantile(Score, .5), `60%`=quantile(Score, .6), `70%`=quantile(Score, .7), `80%`=quantile(Score, .8))
+formatted_vs_unformatted
+```
+
+The feature thaI I analyzed for questions was whether a question was well-formatted or not. I defined "well-formatted" as questions where the first paragraph starts with "How" and ends with "?". I chose this feature because I wanted to see the effect that question quality has on its score. There seems to be a positive relationship between question quality and score. From my plot, the proportion of scores is skewed right for non-well-formatted questions, while the proportion of scores is visibly less skewed for well-formatted questions. This is also supported by the quantiles for both groups, with well-formatted questions having much higher percentiles across the board.
+
+```{r}
+data_answers <- read_csv("Answers_trunc.csv")
+data_answers1 <- data_answers %>%
+  filter(!is.na(Score)) %>%
+  mutate(docs_python=str_detect(Body, "http://docs.python.org"))
+  pretty_data_answers1 <- data_answers1 %>%
+  filter(Score<100)
+ggplot(pretty_data_answers1) +
+  geom_density(aes(Score, color=docs_python)) +
+  labs(title="Scores For Answers that referenced 'docs.python.org'") +
+  xlab("Score") + 
+  ylab("Proportion") +
+  scale_color_discrete(name="Referenced docs.python.org", labels=c("No", "Yes"))
+```
+```{r}
+docs_python_quantiles <- data_answers1 %>%
+  group_by(docs_python) %>%
+  summarize(`30%`=quantile(Score, .3), `40%`=quantile(Score, .4), `50%`=quantile(Score, .5), `60%`=quantile(Score, .6), `70%`=quantile(Score, .7), `80%`=quantile(Score, .8))
+docs_python_quantiles
+```
+
+The feature that I analyzed for answers was whether an answer referenced "http://docs.python.org". After looking through a lot of the answers, this was a website that seemed to pop up a lot, so I wanted to see if there was a correlation between references to this website and how helpful the answer was. There seems to be a weak positive relationship between referencing the website and answer score. Both proportions are heavily skewed right, but the answers with the website reference have a lot lower peak which indicates that there are less lower scores. This is reflected in the quantiles, where answers with the website reference have higher scores for all relevant quantile intervals. 
+
