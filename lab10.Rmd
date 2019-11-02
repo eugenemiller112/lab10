@@ -98,7 +98,11 @@ questions
 ggplot(data = answers, mapping = aes(pcount, Score))+
   geom_jitter()+ylim(c(0,4000))+
   geom_smooth(method = "loess", se = F)+
-  labs(title = "Number of Paragraphs Vs. Score", y="Score",x="Number of Paragraphs")
+  labs(title = "Number of Paragraphs in answer Vs. Score", y="Score",x="Number of Paragraphs")
+ggplot(data = questions, mapping = aes(pcount, Score))+
+  geom_jitter()+ylim(c(0,4000))+
+  geom_smooth(method = "loess", se = F)+
+  labs(title = "Number of Paragraphs in question Vs. Score", y="Score",x="Number of Paragraphs")
 ```
 
 This plot shows the relationships between numbers of paragraphs and score. Althought the line shows that as numbers of paragraph growing up the score is going up too, from the plot we can see that most of the dots gather around between 0 to 10 for x-axis and between 0 to 1000 for y-axis which means writing more paragraphs would not guarantee people get higher score and higher score does not exactly depend on number of paragraphs. 
