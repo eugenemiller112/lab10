@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ---
 title: "Lab 10: Text and Time Analysis"
 author: "Johnny Tamanaha, Emily Archambault, Kaiyuan Fan, Eugene Miller, Jingzhi Zhang"
@@ -150,6 +149,40 @@ docs_python_quantiles
 ```
 
 The feature that I analyzed for answers was whether an answer referenced "http://docs.python.org". After looking through a lot of the answers, this was a website that seemed to pop up a lot, so I wanted to see if there was a correlation between references to this website and how helpful the answer was. There seems to be a weak positive relationship between referencing the website and answer score. Both proportions are heavily skewed right, but the answers with the website reference have a lot lower peak which indicates that there are less lower scores. This is reflected in the quantiles, where answers with the website reference have higher scores for all relevant quantile intervals. 
+
+### Kaiyuan Fan
+
+The feature I measure was whether hyperlink present in Questions or Answers will influence score. To do this, I search the `"</a>"` in the file.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+html_questions <- questions %>%
+  filter(str_detect(`Body`, "</a>")) %>%
+  mutate(link=TRUE)
+nonhtml<- questions %>%
+  filter(!str_detect(`Body`, "</a>")) %>%
+  mutate(link=FALSE)
+combin<- full_join(html_questions,nonhtml)
+combin
+ggplot(combin)+
+  geom_density(aes(Score, color=link))+
+  scale_x_continuous(lim=c(0,100))+
+  labs(title = "Comparison of the Distribution of the Score with and without Hyperlink in Questions")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+html_answers <- answers %>%
+  filter(str_detect(`Body`, "</a>")) %>%
+  mutate(link=TRUE)
+nonhtml_answers<- answers %>%
+  filter(!str_detect(`Body`, "</a>")) %>%
+  mutate(link=FALSE)
+combine1<- full_join(html_questions,nonhtml_answers)
+ggplot(combine1)+
+  geom_density(aes(Score, color=link))+
+  scale_x_continuous(lim=c(0,100))+
+  labs(title = "Comparison of the Distribution of the Score with and without Hyperlink in Answers")
+```
+
+From the plots I got, I find the score is more distribute within the small score when it doesn't have hyperlink. However, score is more distribute within the bigger score when it does have hyperlink. Therefore, I conclude that hyperlink has positive influence on the score, which increases the score.
 
 ### Emily Archambault
 
@@ -187,191 +220,3 @@ pythonavg <- mean(answerdata$Score)
 nopythonavg <- mean(answerdata2$Score)
 ```
 The feature I examined for answers was whether or not the answer contained the word "Python". I noticed while reading through the answers that some were very short and specific, while some gave broader answers, perhaps referencing overall Python behaviors and demonstrating a strong understanding of the program.  I wanted to see if a reference to Python impacted the score of the answer, and my graph indicates that it does. This is supported with further data; the average score for an answer containing the word "Python" is `r pythonavg` and the average score for an answer without is `r nopythonavg` 
-=======
----
-title: "Lab 10: Text and Time Analysis"
-author: "Johnny Tamanaha, Emily Archambault, Kaiyuan Fan, Eugene Miller, Jingzhi Zhang"
-date: "11/3/2019"
-output: html_document
----
-```{r, setup, message = FALSE, echo = FALSE, warning = FALSE}
-library(tidyverse)
-temp <- tempfile()
-questions <- read_csv("Questions_trunc.csv")
-#data1 <- unzip("Answers_trunc.csv.zip")
-answers <- read_csv("./Answers_trunc.csv")
-
-```
-## Timeliness of the Answer as a Feature
-```{r, fig.align='center', echo = FALSE, message = FALSE, warning = FALSE}
-#Timeliness of the Answer as a Feature
-
-data <- answers %>%
-  group_by(ParentId) %>% #All answers for each question grouped
-  mutate(ans_rank = order(order(CreationDate, decreasing = FALSE))) #Ranking answers by CreationDate
-
-#Plotting average score for every rank
-ggplot(data, aes(x = ans_rank, y = Score)) +
-  stat_summary(fun.y="mean", geom="bar") +
-  labs(x = "Answer Rank", title = "Average Score for Every Answer Rank") +
-  theme(plot.title = element_text(hjust = 0.5))
-```
-
-From this plot, it does not appear as though the timeliness of an answer has any correlation to the score it receives.
-
-Does the data for scores follow a normal distribution? We will create a histogram of scores to determine if the data follows a normal distribution.
-
-```{r, message = FALSE, warning = FALSE, echo = FALSE, fig.align = 'center'}
-ggplot(answers)+
-  geom_histogram(mapping = aes(x = Score)) +
-  scale_x_continuous(name="Score",limits = c(0,100)) + 
-  labs(y = "Number of Answers", title = "Distribution of Scores for Answers") +
-  theme(plot.title = element_text(hjust = 0.5))
-```
-
-From this plot we can see that scores to not follow a normal distribution. This means that Z scores and percentiles will not have the same meaning that they would if the data was normal. The relationship between Z score and percentile is not preserved.
-
-
-## Individual Sections
-
-### Eugene Miller
-
-The feature of the text that I am measuring is whether a code chunk was included in a question or answer. That is, whether the string `"<code>"` is in a question or an answer. 
-
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE}
-code_questions <- questions %>%
-  filter(str_detect(`Body`, "<code>"))
-noncode_questions <- questions %>%
-  filter(!str_detect(`Body`, "<code>"))
-code_answers <- answers %>%
-  filter(str_detect(`Body`, "<code>"))
-noncode_answers <- answers %>%
-  filter(!str_detect(`Body`, "<code>"))
-
-question_prop <- count(code_questions)/count(questions)
-answer_prop <- count(code_answers)/count(answers)
-
-question_mean <- mean(noncode_questions$Score)
-cquestion_mean <- mean(code_questions$Score)
-answer_mean <- mean(noncode_answers$Score)
-canswer_mean <- mean(code_answers$Score)
-
-plot_data <- tribble(
-  ~Title, ~Score,
-  "Noncode Questions", question_mean,
-  "Code Questions", cquestion_mean,
-  "Noncode Answers", answer_mean,
-  "Code Answers", canswer_mean
-)
-
-ggplot(plot_data) +
-  geom_col(aes(x = reorder(Title,Score), y = Score)) + 
-  labs(y = "Average Score", x = "Entry Type", title = "Comparison of Code vs Noncode for Questions & Answers") +
-  theme(plot.title = element_text(hjust = 0.5))
-```
-
-The proportion of questions that invoke the `"<code>"` string is `r question_prop` and the proportion for answers is `r answer_prop`. 
-
-The mean score for a question without code is `r question_mean`, however if the poster includes code in their question it is `r cquestion_mean`. Likewise, for a answer with no code the mean score is `r answer_mean` and if code is included `r canswer_mean`. Therefore both good questions and good answers include code. This makes sense, as Stackoverflow is a forum based on coding questions. Communicating directly via code is more relevant to the theme of the board, and this is why posts involving code have a higher average score. 
-
-### Jingzhi Zhang
-
-The feature of the text that I am measuring is the number of paragraphs that were included in a question or an answer. That is, weather the string `"<p>"` is in a question or an answer.
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.align = 'center'}
-answers <- mutate(answers, pcount = str_count(Body, "<p>"))
-answers
-questions <- mutate(questions, pcount = str_count(Body, "<p>"))
-questions
-
-ggplot(data = answers, mapping = aes(pcount, Score))+
-  geom_jitter()+ylim(c(0,4000))+
-  geom_smooth(method = "loess", se = F)+
-  labs(title = "Number of Paragraphs Vs. Score", y="Score",x="Number of Paragraphs")
-```
-
-This plot shows the relationships between numbers of paragraphs and score. Althought the line shows that as numbers of paragraph growing up the score is going up too, from the plot we can see that most of the dots gather around between 0 to 10 for x-axis and between 0 to 1000 for y-axis which means writing more paragraphs would not guarantee people get higher score and higher score does not exactly depend on number of paragraphs. 
-
-### Johnny Tamanaha
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-data_questions <- read_csv("Questions_trunc.csv")
-data_questions1 <- data_questions %>%
-  mutate(is_question_formatted=str_detect(Body, "^<p>How[^(<p>)]*?")) %>%
-  filter( !is.na(Score))
-  pretty_data_questions1 <- data_questions1 %>%
-  filter(Score<100)
-ggplot(pretty_data_questions1) +
-  geom_density(aes(x=Score, color=is_question_formatted)) +
-  labs(title="Scores For Formatted and Unformatted Questions") +
-  xlab("Score") + 
-  ylab("Proportion") +
-  scale_color_discrete(name="Question Type", labels=c("Unformatted", "Formatted"))
-```
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-formatted_vs_unformatted <- data_questions1 %>%
-  group_by(is_question_formatted) %>%
-  summarize(`30%`=quantile(Score, .3), `40%`=quantile(Score, .4), `50%`=quantile(Score, .5), `60%`=quantile(Score, .6), `70%`=quantile(Score, .7), `80%`=quantile(Score, .8))
-formatted_vs_unformatted
-```
-
-The feature thaI I analyzed for questions was whether a question was well-formatted or not. I defined "well-formatted" as questions where the first paragraph starts with "How" and ends with "?". I chose this feature because I wanted to see the effect that question quality has on its score. There seems to be a positive relationship between question quality and score. From my plot, the proportion of scores is skewed right for non-well-formatted questions, while the proportion of scores is visibly less skewed for well-formatted questions. This is also supported by the quantiles for both groups, with well-formatted questions having much higher percentiles across the board.
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-data_answers <- read_csv("Answers_trunc.csv")
-data_answers1 <- data_answers %>%
-  filter(!is.na(Score)) %>%
-  mutate(docs_python=str_detect(Body, "http://docs.python.org"))
-  pretty_data_answers1 <- data_answers1 %>%
-  filter(Score<100)
-ggplot(pretty_data_answers1) +
-  geom_density(aes(Score, color=docs_python)) +
-  labs(title="Scores For Answers that referenced 'docs.python.org'") +
-  xlab("Score") + 
-  ylab("Proportion") +
-  scale_color_discrete(name="Referenced docs.python.org", labels=c("No", "Yes"))
-```
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-docs_python_quantiles <- data_answers1 %>%
-  group_by(docs_python) %>%
-  summarize(`30%`=quantile(Score, .3), `40%`=quantile(Score, .4), `50%`=quantile(Score, .5), `60%`=quantile(Score, .6), `70%`=quantile(Score, .7), `80%`=quantile(Score, .8))
-docs_python_quantiles
-```
-
-The feature that I analyzed for answers was whether an answer referenced "http://docs.python.org". After looking through a lot of the answers, this was a website that seemed to pop up a lot, so I wanted to see if there was a correlation between references to this website and how helpful the answer was. There seems to be a weak positive relationship between referencing the website and answer score. Both proportions are heavily skewed right, but the answers with the website reference have a lot lower peak which indicates that there are less lower scores. This is reflected in the quantiles, where answers with the website reference have higher scores for all relevant quantile intervals. 
-
-
-### Kaiyuan Fan
-
-The feature I measure was whether hyperlink present in Questions or Answers will influence score. To do this, I search the `"</a>"` in the file.
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-html_questions <- questions %>%
-  filter(str_detect(`Body`, "</a>")) %>%
-  mutate(link=TRUE)
-nonhtml<- questions %>%
-  filter(!str_detect(`Body`, "</a>")) %>%
-  mutate(link=FALSE)
-combin<- full_join(html_questions,nonhtml)
-combin
-ggplot(combin)+
-  geom_density(aes(Score, color=link))+
-  scale_x_continuous(lim=c(0,100))+
-  labs(title = "Comparison of the Distribution of the Score with and without Hyperlink in Questions")
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-html_answers <- answers %>%
-  filter(str_detect(`Body`, "</a>")) %>%
-  mutate(link=TRUE)
-nonhtml_answers<- answers %>%
-  filter(!str_detect(`Body`, "</a>")) %>%
-  mutate(link=FALSE)
-combine1<- full_join(html_questions,nonhtml_answers)
-ggplot(combine1)+
-  geom_density(aes(Score, color=link))+
-  scale_x_continuous(lim=c(0,100))+
-  labs(title = "Comparison of the Distribution of the Score with and without Hyperlink in Answers")
-```
-
-From the plots I got, I find the score is more distribute within the small score when it doesn't have hyperlink. However, score is more distribute within the bigger score when it does have hyperlink. Therefore, I conclude that hyperlink has positive influence on the score, which increases the score.
->>>>>>> master
