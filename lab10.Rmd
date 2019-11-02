@@ -8,7 +8,9 @@ output: html_document
 library(tidyverse)
 temp <- tempfile()
 questions <- read_csv("Questions_trunc.csv")
-#data1 <- unzip("Answers_trunc.csv.zip")
+
+data1 <- unzip("Answers_trunc.csv.zip")
+
 answers <- read_csv("./Answers_trunc.csv")
 
 ```
@@ -40,7 +42,6 @@ ggplot(answers)+
 ```
 
 From this plot we can see that scores to not follow a normal distribution. This means that Z scores and percentiles will not have the same meaning that they would if the data was normal. The relationship between Z score and percentile is not preserved.
-
 
 ## Individual Sections
 
@@ -220,3 +221,9 @@ pythonavg <- mean(answerdata$Score)
 nopythonavg <- mean(answerdata2$Score)
 ```
 The feature I examined for answers was whether or not the answer contained the word "Python". I noticed while reading through the answers that some were very short and specific, while some gave broader answers, perhaps referencing overall Python behaviors and demonstrating a strong understanding of the program.  I wanted to see if a reference to Python impacted the score of the answer, and my graph indicates that it does. This is supported with further data; the average score for an answer containing the word "Python" is `r pythonavg` and the average score for an answer without is `r nopythonavg` 
+
+## Features that Affect Score
+From our individual sections, the feature that affects the score of a question the most is whether or not the question is well-formatted. We see a higher density of these questions having higher scores compared to an average question. A possible reason as to why this leads to a higher question score is that well-formatted questions are more specific and easier to answer than non formatted questions. The plot "Scores For Formatted and Unformatted Questions" supports this finding.
+
+For answers, the features that affected scores the most were whether or not the string `"<code>"` appeared and whether the website "http://docs.python.org" was referenced. A possible reason as to why `"<code>"` positively correlates with score is that these answers give very specific technical answers to the question being asked. If the question is code related, a code answers is the most appropriate format. Referencing "http://docs.python.org" could be a good positive influencer of score because it gives tutorials and methods in python that are direct and to the point, allowing any person asking a question to resolve their issue by themselves. 
+
