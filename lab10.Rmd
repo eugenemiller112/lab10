@@ -150,3 +150,37 @@ docs_python_quantiles
 
 The feature that I analyzed for answers was whether an answer referenced "http://docs.python.org". After looking through a lot of the answers, this was a website that seemed to pop up a lot, so I wanted to see if there was a correlation between references to this website and how helpful the answer was. There seems to be a weak positive relationship between referencing the website and answer score. Both proportions are heavily skewed right, but the answers with the website reference have a lot lower peak which indicates that there are less lower scores. This is reflected in the quantiles, where answers with the website reference have higher scores for all relevant quantile intervals. 
 
+
+### Kaiyuan Fan
+
+The feature I measure was whether hyperlink present in Questions or Answers will influence score. To do this, I search the `"</a>"` in the file.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+html_questions <- questions %>%
+  filter(str_detect(`Body`, "</a>")) %>%
+  mutate(link=TRUE)
+nonhtml<- questions %>%
+  filter(!str_detect(`Body`, "</a>")) %>%
+  mutate(link=FALSE)
+combin<- full_join(html_questions,nonhtml)
+combin
+ggplot(combin)+
+  geom_density(aes(Score, color=link))+
+  scale_x_continuous(lim=c(0,100))+
+  labs(title = "Comparison of the Distribution of the Score with and without Hyperlink in Questions")
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+html_answers <- answers %>%
+  filter(str_detect(`Body`, "</a>")) %>%
+  mutate(link=TRUE)
+nonhtml_answers<- answers %>%
+  filter(!str_detect(`Body`, "</a>")) %>%
+  mutate(link=FALSE)
+combine1<- full_join(html_questions,nonhtml_answers)
+ggplot(combine1)+
+  geom_density(aes(Score, color=link))+
+  scale_x_continuous(lim=c(0,100))+
+  labs(title = "Comparison of the Distribution of the Score with and without Hyperlink in Answers")
+```
+
+From the plots I got, I find the score is more distribute within the small score when it doesn't have hyperlink. However, score is more distribute within the bigger score when it does have hyperlink. Therefore, I conclude that hyperlink has positive influence on the score, which increases the score.
