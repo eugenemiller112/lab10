@@ -150,3 +150,39 @@ docs_python_quantiles
 
 The feature that I analyzed for answers was whether an answer referenced "http://docs.python.org". After looking through a lot of the answers, this was a website that seemed to pop up a lot, so I wanted to see if there was a correlation between references to this website and how helpful the answer was. There seems to be a weak positive relationship between referencing the website and answer score. Both proportions are heavily skewed right, but the answers with the website reference have a lot lower peak which indicates that there are less lower scores. This is reflected in the quantiles, where answers with the website reference have higher scores for all relevant quantile intervals. 
 
+### Emily Archambault
+
+```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE}
+library(stringr)
+q_mark <- questions %>%
+  mutate(questionmark = str_detect(Title, "\\?$")) %>%
+  filter(!is.na(Score))
+
+ggplot(q_mark) + 
+  geom_density(mapping = aes(x = Score, color = questionmark)) +
+  coord_cartesian(xlim = c(0,100)) + 
+  labs(xlab = "Score", y = "Proportion", title = "Effect of Question Marks on Question Score")
+```
+
+The feature I analyzed for questions was whether or not the title of the question ended with a question mark. My graph indicates that there is a positive correlation between those questions which end with a question mark and a higher score. A question mark could indicate a more direct, specific question that is easier to answer, and to me, seemed to be "friendlier". I wondered if this was a trend that could impact the overall score, and it appears that it does.
+
+```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE}
+library(stringr)
+answerdata <- answers %>%
+  filter(str_detect(Body, "Python")) %>%
+  filter(!is.na(Score))
+answerdata2 <- answers %>%
+  filter(!str_detect(Body,"Python")) %>% 
+  filter(!is.na(Score))
+pythondata <- answers %>%
+  mutate(pythonreference = str_detect(Body, "Python"))%>%
+  filter(!is.na(Score))
+ ggplot(pythondata) + 
+  geom_density(mapping = aes(x = Score, color = pythonreference)) + 
+  coord_cartesian(xlim = c(0,150)) + 
+   labs(title = "Impact of Python Reference on Answer Score", y="Propotion")
+
+pythonavg <- mean(answerdata$Score)
+nopythonavg <- mean(answerdata2$Score)
+```
+The feature I examined for answers was whether or not the answer contained the word "Python". I noticed while reading through the answers that some were very short and specific, while some gave broader answers, perhaps referencing overall Python behaviors and demonstrating a strong understanding of the program.  I wanted to see if a reference to Python impacted the score of the answer, and my graph indicates that it does. This is supported with further data; the average score for an answer containing the word "Python" is `r pythonavg` and the average score for an answer without is `r nopythonavg` 
